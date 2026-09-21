@@ -1,11 +1,13 @@
-﻿## Decision and Reasoning
+# Explainability Contract: TestMedic
 
-TestMedic makes an assessment by analyzing evidence related to test structure and quality. It connects detected problems to supporting evidence and practical actions.
+## Decision
 
-## Inputs and Data Sources
+TestMedic decides whether a project has recognizable automated-test evidence. It flags a missing test surface when no test- or spec-like file is detected, then connects that observation to a practical testing improvement.
 
-TestMedic uses source files, configuration, project structure, and relevant test structure and quality data from the inspected project.
+## Inputs
 
-## Limits and Constraints
+It uses the inspected project file list and readable source content as its primary evidence. The decision is driven by explicit diagnostic rules rather than an assumed coverage percentage.
 
-TestMedic is limited when required information is missing, inaccessible, generated dynamically, or incomplete.
+## Limits
+
+It cannot prove that a project is fully tested, nor can absence of a recognizable test filename prove that tests do not exist. Generated tests, external test suites, and nonstandard naming may require manual review.
