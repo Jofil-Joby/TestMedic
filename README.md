@@ -1,69 +1,133 @@
 # TestMedic
 
-> Portable agent for diagnosing missing, weak, or poorly signposted test coverage in software projects.
+> A portable engineering agent for **test structure and quality**.
 
-## What it does
+TestMedic inspects observable project evidence, detects **missing or weak test assets**, and produces an explainable improvement plan. Its purpose is not to replace specialist tooling. It provides a focused, auditable diagnostic layer that can travel across agent runtimes.
 
-TestMedic inspects a project and looks for evidence that automated testing is absent or difficult to recognize. Instead of pretending to understand the entire codebase, it reports observable evidence and turns that evidence into a focused improvement plan.
+## What makes it different
 
-### Diagnostic fingerprint
-
-**Test structure → evidence → finding → repair plan**
-
-Its core signal is the presence or absence of recognizable test/specification files, while the shared scanner records the surrounding project evidence used to explain the result.
-
-## Why this agent is distinct
-
-TestMedic is intentionally narrow. It is not a general code reviewer. Its job is to answer one practical question:
-
-> **Can a project clearly demonstrate that it has automated tests?**
-
-That makes it useful as a first-pass quality gate in a larger agent pipeline.
-
-## Passport architecture
+This project follows an **evidence → decision → explanation** model:
 
 ```text
 Project
   ↓
 Scanner
   ↓
-Test-focused diagnostic rule
+Domain Evidence
   ↓
-Evidence-backed finding
+Deterministic Diagnostic Rule
   ↓
-Improvement plan
+Finding + Evidence + Confidence
+  ↓
+Improvement Plan
 ```
 
-The portable contract is separated from the diagnostic implementation, so the agent can be exported without rewriting its identity and behavior for every framework.
+The agent does not invent evidence. A finding is tied to what the scanner can actually observe.
+
+## Diagnostic contract
+
+| Layer | TestMedic behavior |
+| --- | --- |
+| Domain | test structure and quality |
+| Primary signal | test/spec files |
+| Remediation | Add or strengthen automated tests |
+| Output | Structured, explainable findings |
+| Uncertainty | Explicitly constrained by available evidence |
+
+## Portable architecture
+
+```text
+                    ┌─────────────────────┐
+                    │   Portable Agent    │
+                    │ identity + behavior  │
+                    └──────────┬──────────┘
+                               │
+              ┌────────────────┼────────────────┐
+              ↓                ↓                ↓
+          Diagnostic        Duties &         Explainability
+            Logic           Workflow           Contract
+              │
+              ↓
+        Runtime Adapters
+       ┌──────┬──────┬──────┬──────┐
+       ↓      ↓      ↓      ↓
+    OpenAI  CrewAI  Claude  Lyzr
+```
+
+The core diagnostic logic is kept separate from framework-specific adapters. This is the central design idea of the project, not four copies of the same agent wearing different hats.
+
+## Repository structure
+
+```text
+agent.yaml          # Portable identity and passport metadata
+SOUL.md             # Identity, principles, and behavior
+AGENTS.md           # Agent responsibilities
+DUTIES.md           # Maker / Checker workflow
+EXPLAINABILITY.md   # Decision, inputs, limits, and evidence contract
+core/               # Shared result model
+tools/              # Scanner and domain diagnostics
+skills/             # Declared capabilities
+workflows/          # Agent workflows
+adapters/           # Runtime-facing adapters
+tests/              # Deliberately diagnostic project fixtures
+```
+
+## Passport portability
+
+The agent is structured for the OpenGAP passport model and can be exported to:
+
+- OpenAI Agents SDK
+- CrewAI
+- Claude Code
+- Lyzr
+
+The important part is the **portable contract**: identity, behavior, duties, explainability, tools, and skills remain defined independently of a single runtime.
 
 ## Verification
 
-This repository includes:
+The repository includes:
+
+- Local adapter verification
+- A domain-specific broken-project fixture
 - OpenGAP-compatible passport metadata
-- local adapters for OpenAI, CrewAI, Claude Code, and Lyzr
-- a broken-project fixture designed to trigger the test diagnostic
-- adapter verification tests
+- Explainability requirements
+- Export verification across the supported targets
 
-The repository has been validated against OpenGAP and its four framework exports have been exercised successfully.
-
-## Repository layout
+The engineering workflow is:
 
 ```text
-agent.yaml          Identity and passport metadata
-SOUL.md             Agent behavior and principles
-EXPLAINABILITY.md   Decision and evidence contract
-AGENTS.md           Agent roles
-DUTIES.md           Maker / Checker duties
-agent.py            Runtime entry point
-tools/              Scanner and diagnostic rules
-adapters/           Portable framework adapters
-tests/              Fixtures and verification
+Validate passport
+    → Verify adapters
+    → Run diagnostic fixture
+    → Export with OpenGAP
+    → Inspect generated artifacts
 ```
 
-## Design principle
+## Scope and limitations
 
-**Evidence before confidence.** A missing recognizable test file is a signal, not proof that a project has no tests. TestMedic reports what it can observe and keeps recommendations bounded to that evidence.
+TestMedic is a focused diagnostic prototype. Its conclusions are limited to the evidence and rules implemented in this repository. It should complement, not replace, production-grade static analysis, security scanners, observability platforms, CI systems, or human review where appropriate.
 
-## Part of the Medic family
+## Why this project exists
 
-TestMedic is one member of a set of focused engineering agents. Each agent owns a different diagnostic domain while sharing the same portable passport structure. The result is a composable toolkit rather than one oversized general-purpose agent.
+This repository is one member of a deliberately modular **Medic agent family**. Each agent applies the same portable passport architecture to a different engineering failure surface.
+
+That makes the collection useful as an interoperability experiment:
+
+```text
+One passport architecture
+        +
+Different diagnostic domains
+        +
+Multiple agent runtimes
+        =
+Portable engineering-agent family
+```
+
+## Challenge context
+
+Built for the **HiDevs × Lyzr Agent Passport Challenge**, exploring portable agent identity, behavior contracts, explainability, verification, and framework interoperability.
+
+## Author
+
+**Jofil Joby**  
+[GitHub](https://github.com/Jofil-Joby)
