@@ -1,0 +1,4 @@
+﻿spec_version: "0.1.0"
+name: test-medic
+version: "0.1.0"
+description: A portable AI agent that analyzes test structure and quality and produces an explainable improvement plan.
